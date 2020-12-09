@@ -16,8 +16,8 @@ class Trainer:
 
     def measure_performance(self, loader):
         running_loss = 0.0
-        correct_count = 0
-        total_count = 0
+        correct_count = 0.0
+        total_count = 0.0
         for data in loader:
             input_ids = data[0].to(self.device)
             attn_masks = data[1].to(self.device)
