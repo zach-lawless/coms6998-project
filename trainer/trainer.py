@@ -1,3 +1,4 @@
+import pandas as pd
 import time
 import torch
 import torch.nn.functional as F
@@ -38,20 +39,35 @@ class Trainer:
 
         return running_loss, acc
 
-    def train_loop(self, train_loader, val_loader=None):
-        print('Starting training loop\n\n')
+    def train_loop(self, train_loader, val_loader, batch_size=128, batch_check=10):
+        print('Starting training loop')
 
-        if val_loader:
-            print('Initial evaluating on validation dataset')
-            val_loss, val_acc = self.measure_performance(val_loader)
-            epoch_summary = f'[Epoch 0] | Val acc: {val_acc:.4f} Val loss: {val_loss:.4f}\n\n'
-            print(epoch_summary)
+        print('Initial evaluating on validation dataset')
+        train_loss, train_acc = self.measure_performance(train_loader)
+        val_loss, val_acc = self.measure_performance(val_loader)
+        epoch_summary = f'[Epoch 0] | Train acc: {train_acc:.4f} Train loss: {train_loss:.4f} Val acc: {val_acc:.4f} Val loss: {val_loss:.4f}'
+        print(epoch_summary)
+
+        epoch_history = [{'epoch': 0,
+                          'train loss': train_loss,
+                          'train accuracy': train_acc,
+                          'validation loss': val_loss,
+                          'validation accuracy': val_acc,
+                          'epoch time': 0}]
+        batch_history = [{'epoch': 0,
+                          'batch': 0,
+                          'train loss': train_loss,
+                          'train accuracy': train_acc,
+                          'validation loss': val_loss,
+                          'validation accuracy': val_acc,
+                          'batch time': 0}]
 
         for epoch in range(self.n_epochs):
-            print(f'--- Epoch: {epoch} ---')
+            print(f'--- Epoch: {epoch+1} ---')
             epoch_start_time = time.time()
             batch_start_time = time.time()
             running_loss = 0.0
+            running_acc = 0.0
 
             for i, data in enumerate(train_loader):
                 input_ids = data[0].to(self.device)
@@ -68,30 +84,55 @@ class Trainer:
                 if self.scheduler:
                     self.scheduler.step()
 
-                # Print statistics periodically
                 running_loss += loss.item()
-                if i % N_MINI_BATCH_CHECK == N_MINI_BATCH_CHECK - 1:
+                probas = F.softmax(outputs, dim=1)
+                preds = torch.argmax(probas, axis=1)
+                running_acc += torch.sum(preds == labels)
+
+                # Print/log statistics periodically
+                if i % batch_check == batch_check - 1:
                     batch_end_time = time.time()
                     total_batch_time = batch_end_time - batch_start_time
+                    batch_loss = running_loss / batch_check
+                    batch_acc = running_acc / batch_check * batch_size
+                    batch_val_loss, batch_val_acc = self.measure_performance(val_loader)
+
+                    batch_history.append({'epoch': epoch+1,
+                                          'batch': i + 1,
+                                          'train loss': batch_loss,
+                                          'train accuracy': batch_acc,
+                                          'validation loss': batch_val_loss,
+                                          'validation accuracy': batch_val_acc,
+                                          'batch time': total_batch_time})
 
                     print(
                         f'[E{epoch + 1:d} B{i + 1:d}] ',
-                        f'Loss: {running_loss / N_MINI_BATCH_CHECK:.5f} ',
+                        f'Loss: {batch_loss:.5f} ',
+                        f'Acc: {batch_acc} ',
                         f'Time: {total_batch_time:.2f} ',
                         f'LR: {self.scheduler.get_last_lr()}' if self.scheduler else '')
 
                     # Reset statistics
                     batch_start_time = time.time()
                     running_loss = 0.0
+                    running_acc = 0.00
 
             epoch_end_time = time.time()
             total_epoch_time = epoch_end_time - epoch_start_time
-            epoch_summary = '[Epoch {}] {} seconds'.format((epoch + 1), total_epoch_time)
+            train_loss, train_acc = self.measure_performance(train_loader)
+            val_loss, val_acc = self.measure_performance(val_loader)
+            epoch_summary = f'[Epoch {epoch + 1}] {total_epoch_time} seconds'
+            epoch_summary += f' | Train acc: {train_acc:.4f} Train loss: {train_loss:.4f} Val acc: {val_acc:.4f} Val loss: {val_loss:.4f}'
 
-            if val_loader:
-                val_loss, val_acc = self.measure_performance(val_loader)
-                epoch_summary += f' | Val acc: {val_acc:.4f} | Val loss: {val_loss:.4f}'
+            epoch_history.append({'epoch': epoch + 1,
+                                  'training loss': train_loss,
+                                  'training accuracy': train_acc,
+                                  'validation loss': val_loss,
+                                  'validation accuracy': val_acc,
+                                  'epoch time': total_epoch_time})
 
             print(epoch_summary)
 
         print('Finished training')
+
+        return pd.DataFrame(epoch_history), pd.DataFrame(batch_history)

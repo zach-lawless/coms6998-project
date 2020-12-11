@@ -1,7 +1,5 @@
 import argparse
 
-import os
-
 from trainer.trainer import Trainer
 from trainer.utils.dataset import get_dataset, get_tensor_datasets, get_data_loaders
 from trainer.utils.learning_scheme import get_learning_scheme, get_scheduler
@@ -60,19 +58,19 @@ def main(args_dict):
 
     # Perform training
     print(f'Beginning finetuning...')
-    trainer.train_loop(train_loader, val_loader)
-    # results = trainer.train_loop(train_loader, val_loader)  # TODO: Set up logging within trainer and return results
+    epoch_history, batch_history = trainer.train_loop(train_loader, val_loader, args_dict['batch_size'])
 
-    # # Save results
-    # experiment_fname = args_dict['filename']
-    # results.to_csv(experiment_fname, index=True)
+    # Save results
+    trial_name = args_dict['trial_name']
+    epoch_history.to_csv(trial_name+'_epoch_history.csv', index=False)
+    batch_history.to_csv(trial_name+'_batch_history.csv', index=False)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Run a finetuning trial')
-    # parser.add_argument('filename',
-    #                     type=str,
-    #                     help='trial output filename')
+    parser.add_argument('trial-name',
+                        type=str,
+                        help='name to give trial (for output saving purposes)')
     parser.add_argument('--transformer',
                         choices=SUPPORTED_TRANSFORMERS,
                         type=str,
@@ -85,6 +83,10 @@ if __name__ == '__main__':
                         type=int,
                         default=128,
                         help='how large of batches to feed to the transformer')
+    parser.add_argument('--batch-logging',
+                        type=int,
+                        default=10,
+                        help='how frequently to log and print finetuning batch info')
     parser.add_argument('--adapter',
                         type=bool,
                         help='whether to add adapters to the transformer or not')
