@@ -6,9 +6,9 @@ def get_learning_scheme(learning_scheme, model, learning_rate):
         optimizer_grouped_parameters = differential_learning_scheme(model, learning_rate)
         optimizer = torch.optim.SGD(optimizer_grouped_parameters)
     elif learning_scheme == 'fixed':
-        optimizer = torch.optim.SGD(learning_rate)
+        optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
     elif learning_scheme == 'nesterov':
-        optimizer = torch.optim.SGD(learning_rate, momentum=0.9, nesterov=True)
+        optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9, nesterov=True)
     else:
         raise NotImplementedError
 
