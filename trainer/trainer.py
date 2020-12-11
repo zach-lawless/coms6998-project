@@ -88,7 +88,7 @@ class Trainer:
                 running_loss += loss.item()
                 probas = F.softmax(outputs, dim=1)
                 preds = torch.argmax(probas, axis=1)
-                running_acc += torch.sum(preds == labels)
+                running_acc += torch.sum(preds == labels).item()
                 total_count += len(labels)
 
                 # Print/log statistics periodically
@@ -101,8 +101,8 @@ class Trainer:
 
                     batch_history.append({'epoch': epoch+1,
                                           'batch': i + 1,
-                                          'train loss': batch_loss.item(),
-                                          'train accuracy': batch_acc.item(),
+                                          'train loss': batch_loss,
+                                          'train accuracy': batch_acc,
                                           'validation loss': batch_val_loss.item(),
                                           'validation accuracy': batch_val_acc.item(),
                                           'batch time': total_batch_time})
