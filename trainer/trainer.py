@@ -49,17 +49,17 @@ class Trainer:
         print(epoch_summary)
 
         epoch_history = [{'epoch': 0,
-                          'train loss': train_loss,
-                          'train accuracy': train_acc,
-                          'validation loss': val_loss,
-                          'validation accuracy': val_acc,
+                          'train loss': train_loss.item(),
+                          'train accuracy': train_acc.item(),
+                          'validation loss': val_loss.item(),
+                          'validation accuracy': val_acc.item(),
                           'epoch time': 0}]
         batch_history = [{'epoch': 0,
                           'batch': 0,
-                          'train loss': train_loss,
-                          'train accuracy': train_acc,
-                          'validation loss': val_loss,
-                          'validation accuracy': val_acc,
+                          'train loss': train_loss.item(),
+                          'train accuracy': train_acc.item(),
+                          'validation loss': val_loss.item(),
+                          'validation accuracy': val_acc.item(),
                           'batch time': 0}]
 
         for epoch in range(self.n_epochs):
@@ -101,10 +101,10 @@ class Trainer:
 
                     batch_history.append({'epoch': epoch+1,
                                           'batch': i + 1,
-                                          'train loss': batch_loss,
-                                          'train accuracy': batch_acc,
-                                          'validation loss': batch_val_loss,
-                                          'validation accuracy': batch_val_acc,
+                                          'train loss': batch_loss.item(),
+                                          'train accuracy': batch_acc.item(),
+                                          'validation loss': batch_val_loss.item(),
+                                          'validation accuracy': batch_val_acc.item(),
                                           'batch time': total_batch_time})
 
                     print(
@@ -128,10 +128,10 @@ class Trainer:
             epoch_summary += f' | Train acc: {train_acc:.4f} Train loss: {train_loss:.4f} Val acc: {val_acc:.4f} Val loss: {val_loss:.4f}'
 
             epoch_history.append({'epoch': epoch + 1,
-                                  'training loss': train_loss,
-                                  'training accuracy': train_acc,
-                                  'validation loss': val_loss,
-                                  'validation accuracy': val_acc,
+                                  'train loss': train_loss.item(),
+                                  'train accuracy': train_acc.item(),
+                                  'validation loss': val_loss.item(),
+                                  'validation accuracy': val_acc.item(),
                                   'epoch time': total_epoch_time})
 
             print(epoch_summary)

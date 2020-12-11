@@ -70,7 +70,7 @@ def main(args_dict):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Run a finetuning trial')
-    parser.add_argument('name',
+    parser.add_argument('--name',
                         type=str,
                         help='name to give trial (for output saving purposes)')
     parser.add_argument('--transformer',
