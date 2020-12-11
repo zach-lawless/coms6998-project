@@ -39,7 +39,7 @@ class Trainer:
 
         return running_loss, acc
 
-    def train_loop(self, train_loader, val_loader, batch_size=128, batch_check=10):
+    def train_loop(self, train_loader, val_loader, batch_logging=10):
         print('Starting training loop')
 
         print('Initial evaluating on validation dataset')
@@ -68,6 +68,7 @@ class Trainer:
             batch_start_time = time.time()
             running_loss = 0.0
             running_acc = 0.0
+            total_count = 0.0
 
             for i, data in enumerate(train_loader):
                 input_ids = data[0].to(self.device)
@@ -88,13 +89,14 @@ class Trainer:
                 probas = F.softmax(outputs, dim=1)
                 preds = torch.argmax(probas, axis=1)
                 running_acc += torch.sum(preds == labels)
+                total_count += len(labels)
 
                 # Print/log statistics periodically
-                if i % batch_check == batch_check - 1:
+                if i % batch_logging == batch_logging - 1:
                     batch_end_time = time.time()
                     total_batch_time = batch_end_time - batch_start_time
-                    batch_loss = running_loss / batch_check
-                    batch_acc = running_acc / batch_check * batch_size
+                    batch_loss = running_loss / batch_logging
+                    batch_acc = running_acc / total_count
                     batch_val_loss, batch_val_acc = self.measure_performance(val_loader)
 
                     batch_history.append({'epoch': epoch+1,
@@ -115,13 +117,14 @@ class Trainer:
                     # Reset statistics
                     batch_start_time = time.time()
                     running_loss = 0.0
-                    running_acc = 0.00
+                    running_acc = 0.0
+                    total_count = 0.0
 
             epoch_end_time = time.time()
             total_epoch_time = epoch_end_time - epoch_start_time
             train_loss, train_acc = self.measure_performance(train_loader)
             val_loss, val_acc = self.measure_performance(val_loader)
-            epoch_summary = f'[Epoch {epoch + 1}] {total_epoch_time} seconds'
+            epoch_summary = f'[Epoch {epoch + 1}] {total_epoch_time:.2f} seconds'
             epoch_summary += f' | Train acc: {train_acc:.4f} Train loss: {train_loss:.4f} Val acc: {val_acc:.4f} Val loss: {val_loss:.4f}'
 
             epoch_history.append({'epoch': epoch + 1,

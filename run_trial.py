@@ -58,17 +58,19 @@ def main(args_dict):
 
     # Perform training
     print(f'Beginning finetuning...')
-    epoch_history, batch_history = trainer.train_loop(train_loader, val_loader, args_dict['batch_size'])
+    epoch_history, batch_history = trainer.train_loop(train_loader, val_loader, args_dict['batch_logging'])
 
     # Save results
-    trial_name = args_dict['trial_name']
+    trial_name = args_dict['name']
+    epoch_history['name'] = trial_name
+    batch_history['name'] = trial_name
     epoch_history.to_csv(trial_name+'_epoch_history.csv', index=False)
     batch_history.to_csv(trial_name+'_batch_history.csv', index=False)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Run a finetuning trial')
-    parser.add_argument('trial-name',
+    parser.add_argument('name',
                         type=str,
                         help='name to give trial (for output saving purposes)')
     parser.add_argument('--transformer',
