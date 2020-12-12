@@ -42,7 +42,7 @@ def main(args_dict):
     learning_scheme = args_dict['learning_scheme']
     learning_rate = args_dict['learning_rate']
     print(f'Configuring {learning_scheme} learning scheme...')
-    optimizer = get_learning_scheme(learning_scheme, model, learning_rate)
+    optimizer = get_learning_scheme(learning_scheme, model, learning_rate, adapter, epoch=0)
 
     # Get scheduler
     print('Setting up scheduler if any...')
@@ -54,7 +54,10 @@ def main(args_dict):
                       n_epochs=args_dict['epochs'],
                       optimizer=optimizer,
                       scheduler=scheduler,
-                      criterion=criterion)
+                      criterion=criterion,
+                      learning_scheme=learning_scheme,
+                      learning_rate=learning_rate,
+                      adapter=adapter)
 
     # Perform training
     print(f'Beginning finetuning...')

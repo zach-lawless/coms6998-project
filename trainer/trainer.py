@@ -2,18 +2,22 @@ import pandas as pd
 import time
 import torch
 import torch.nn.functional as F
+from utils.learning_scheme import get_learning_scheme
 
 N_MINI_BATCH_CHECK = 200
 
 
 class Trainer:
-    def __init__(self, model, n_epochs, optimizer, scheduler, criterion):
+    def __init__(self, model, n_epochs, optimizer, scheduler, criterion, learning_scheme, learning_rate, adapter):
         self.device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
         self.model = model.to(self.device)
         self.n_epochs = n_epochs
         self.optimizer = optimizer
         self.scheduler = scheduler
         self.criterion = criterion.to(self.device)
+        self.learning_scheme = learning_scheme
+        self.learning_rate = learning_rate
+        self.adapter = adapter
 
     def measure_performance(self, loader):
         running_loss = 0.0
@@ -63,6 +67,14 @@ class Trainer:
                           'batch time': 0}]
 
         for epoch in range(self.n_epochs):
+
+            if self.learning_scheme == 'gradual-unfreeze':
+                self.optimizer = get_learning_scheme(self.learning_scheme,
+                                                     self.model,
+                                                     self.learning_rate,
+                                                     self.adapter,
+                                                     epoch+1)
+
             print(f'--- Epoch: {epoch+1} ---')
             epoch_start_time = time.time()
             batch_start_time = time.time()

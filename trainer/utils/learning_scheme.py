@@ -1,7 +1,7 @@
 import torch
 
 
-def get_learning_scheme(learning_scheme, model, learning_rate):
+def get_learning_scheme(learning_scheme, model, learning_rate, adapter, epoch):
     if learning_scheme == 'differential':
         optimizer_grouped_parameters = differential_learning_scheme(model, learning_rate)
         optimizer = torch.optim.SGD(optimizer_grouped_parameters)
@@ -9,6 +9,9 @@ def get_learning_scheme(learning_scheme, model, learning_rate):
         optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
     elif learning_scheme == 'nesterov':
         optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9, nesterov=True)
+    elif learning_scheme == 'gradual-unfreeze':
+        optimizer_grouped_parameters = gradual_unfreezing_learning_scheme(model, learning_rate, adapter, epoch)
+        optimizer = torch.optim.SGD(optimizer_grouped_parameters)
     else:
         raise NotImplementedError
 
@@ -31,6 +34,26 @@ def differential_learning_scheme(model, learning_rate=0.1, divisor=2.6):
     optimizer_grouped_parameters = [
         {'params': p, 'lr': param_prefix_lr_lookup[n.partition('.weight')[0].partition('.bias')[0]]}
         for n, p in model.named_parameters() if p.requires_grad
+    ]
+
+    return optimizer_grouped_parameters
+
+
+def gradual_unfreezing_learning_scheme(model, learning_rate, adapter, epoch=1):
+    trainable_layers = []
+    for n, p in model.named_parameters():
+        if p.requires_grad:
+            base = n.partition('.weight')[0].partition('.bias')[0]
+            if adapter:
+                if base not in trainable_layers and 'adapter' in base:
+                    trainable_layers.append(base)
+            else:
+                if base not in trainable_layers:
+                    trainable_layers.append(base)
+
+    optimizer_grouped_parameters = [
+        {'params': p, 'lr': learning_rate}
+        for n, p in model.named_parameters() if p.requires_grad and n.partition('.weight')[0].partition('.bias')[0] in trainable_layers[-epoch:]
     ]
 
     return optimizer_grouped_parameters
