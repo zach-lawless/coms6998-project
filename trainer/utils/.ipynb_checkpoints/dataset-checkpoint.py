@@ -24,7 +24,8 @@ def get_tensor_datasets(dataset_dict, splits, tokenizer):
     return split_datasets
 
 
-def get_data_loaders(split_datasets):
-    train_loader = DataLoader(split_datasets['train'], batch_size=128, shuffle=True)
-    val_loader = DataLoader(split_datasets['validation'], batch_size=128, shuffle=False)
-    return train_loader, val_loader
+def get_data_loaders(split_datasets, batch_size):
+    train_loader = DataLoader(split_datasets['train'], batch_size, shuffle=True)
+    val_loader = DataLoader(split_datasets['validation'], batch_size, shuffle=False)
+    test_loader = DataLoader(split_datasets['test'], batch_size, shuffle=False)
+    return train_loader, val_loader, test_loader

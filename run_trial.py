@@ -27,7 +27,7 @@ def main(args_dict):
     splits = list(dataset_dict.keys())
     print(f'Creating data loader for {splits} splits...')
     split_datasets = get_tensor_datasets(dataset_dict, splits, tokenizer)
-    train_loader, val_loader = get_data_loaders(split_datasets, args_dict['batch_size'])
+    train_loader, val_loader, test_loader = get_data_loaders(split_datasets, args_dict['batch_size'])
 
     # Load model
     adapter = args_dict['adapter']
@@ -62,6 +62,12 @@ def main(args_dict):
     # Perform training
     print(f'Beginning finetuning...')
     epoch_history, batch_history = trainer.train_loop(train_loader, val_loader, args_dict['batch_logging'])
+    
+    # Print holdout test metrics
+    # NOTE: Commenting out as all labels in the test set are -1 and an error is thrown
+    # print(f'Evaluating on test dataset...')
+    # test_loss, test_acc = trainer.measure_performance(test_loader)
+    # print(f'Test loss: {test_loss.item()}, Test accuracy: {test_acc.item()}')
 
     # Save results
     trial_name = args_dict['name']
