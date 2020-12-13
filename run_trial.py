@@ -7,7 +7,7 @@ from trainer.utils.transformer import get_tokenizer, get_transformer, get_criter
 
 SUPPORTED_TRANSFORMERS = ['bert-base-uncased']
 SUPPORTED_DATASETS = ['sst2']
-SUPPORTED_LEARNING_SCHEMES = ['differential', 'fixed', 'nesterov']
+SUPPORTED_LEARNING_SCHEMES = ['differential', 'fixed', 'nesterov', 'gradual-unfreeze']
 SUPPORTED_SCHEDULERS = ['cyclic-triangular']
 
 

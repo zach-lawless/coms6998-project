@@ -45,7 +45,7 @@ def gradual_unfreezing_learning_scheme(model, learning_rate, adapter, epoch=1):
         if p.requires_grad:
             base = n.partition('.weight')[0].partition('.bias')[0]
             if adapter:
-                if base not in trainable_layers and 'adapter' in base:
+                if base not in trainable_layers and 'adapter' or 'classifier' in base:
                     trainable_layers.append(base)
             else:
                 if base not in trainable_layers:
