@@ -2,7 +2,7 @@ import pandas as pd
 import time
 import torch
 import torch.nn.functional as F
-from utils.learning_scheme import get_learning_scheme
+from trainer.utils.learning_scheme import get_learning_scheme
 
 N_MINI_BATCH_CHECK = 200
 
