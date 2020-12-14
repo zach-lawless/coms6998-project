@@ -10,7 +10,7 @@ Project repo for Columbia's Fall 2020 COMS 6998 Deep Learning System Performance
 
 # Results Summary
 
-The following table contains the performance metrics associated with the experiments that we performed.
+The following table contains the performance metrics associated with the experiments that we performed on the SST2 dataset.
 
 | Dataset | Epochs | Batch Size | Learning Scheme | Learning Rate | Adapter | Scheduler | Validation Loss | Validation Accuracy |
 |---------|--------|------------|-----------------|---------------|---------|-----------|-----------------|---------------------|
@@ -24,6 +24,11 @@ The following table contains the performance metrics associated with the experim
 | SST2    | 5      | 32         | Differential    | 0.01          | Yes     |           | 0.345           | 0.858               |
 | SST2    | 5      | 32         | Gradual Unfreeze| 0.01          |         |           | 0.389           | 0.835               |
 | SST2    | 5      | 32         | Gradual Unfreeze| 0.01          | Yes     |           | 0.424           | 0.806               |
+
+The following table contains the performance metrics associated with the experiments that we performed on the CoLA dataset.
+
+| Dataset | Epochs | Batch Size | Learning Scheme | Learning Rate | Adapter | Scheduler | Validation Loss | Validation Accuracy |
+|---------|--------|------------|-----------------|---------------|---------|-----------|-----------------|---------------------|
 | CoLA    | 10     | 32         | Fixed           | 0.01          |         |           | 0.483           | 0.772               |
 | CoLA    | 10     | 32         | Fixed           | 0.01          | Yes     |           | 0.458           | 0.776               |
 | CoLA    | 10     | 32         | Fixed           | 0.01          |         | Triangle  | 0.433           | 0.822               |
