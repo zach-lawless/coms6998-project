@@ -108,7 +108,7 @@ if __name__ == '__main__':
     parser.add_argument('--learning-rate',
                         type=float,
                         help='the learning rate to use for finetuning')
-    parser.add_argument('--max_learning_rate',
+    parser.add_argument('--max-learning-rate',
                         type=float,
                         default=0.1,
                         help='the max learning rate if using a scheduler')
