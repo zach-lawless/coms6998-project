@@ -10,7 +10,7 @@ Team Members:
 The general purpose of this repository is for prototyping and module development of a benchmarking framework that
 enables running experiments for a variety of finetuning techniques.
 
-The corresponding report for this assignment is in the repo as `final_report.pdf`.
+The corresponding report for this assignment is in the repo as [report.pdf](report.pdf).
 
 # Repository Overview
 
